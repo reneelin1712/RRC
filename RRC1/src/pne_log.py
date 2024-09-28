@@ -146,24 +146,24 @@ best_beta = None
 best_log_likelihood = float('-inf')
 optimiser = optimisers.ScipyOptimiser(method='l-bfgs-b', options={'maxiter': 1000, 'ftol': 1e-8})
 
-# # Generate grid search for three betas, one for each feature
-# for beta1_init in np.linspace(-1, 0, 10):  # Adjust the range if needed
-#     for beta2_init in np.linspace(-1, 0, 10):  # Adjust the range if needed
-#         for beta3_init in np.linspace(-1, 0, 10):  # Adjust the range if needed
-#             model_est = RecursiveLogitModelEstimation(network_struct, observations_record=obs_index_list,
-#                                                       initial_beta=[beta1_init, beta2_init, beta3_init], mu=1,
-#                                                       optimiser=optimiser)
-#             log_likelihood = model_est.get_log_likelihood()[0]
-#             print(f"Initial betas: [{beta1_init}, {beta2_init}, {beta3_init}], Log-likelihood: {log_likelihood}")
+# Generate grid search for three betas, one for each feature
+for beta1_init in np.linspace(-1, 0, 10):  # Adjust the range if needed
+    for beta2_init in np.linspace(-1, 0, 10):  # Adjust the range if needed
+        for beta3_init in np.linspace(-1, 0, 10):  # Adjust the range if needed
+            model_est = RecursiveLogitModelEstimation(network_struct, observations_record=obs_index_list,
+                                                      initial_beta=[beta1_init, beta2_init, beta3_init], mu=1,
+                                                      optimiser=optimiser)
+            log_likelihood = model_est.get_log_likelihood()[0]
+            print(f"Initial betas: [{beta1_init}, {beta2_init}, {beta3_init}], Log-likelihood: {log_likelihood}")
             
-#             if log_likelihood > best_log_likelihood:
-#                 best_log_likelihood = log_likelihood
-#                 best_beta = [beta1_init, beta2_init, beta3_init]
+            if log_likelihood < best_log_likelihood:
+                best_log_likelihood = log_likelihood
+                best_beta = [beta1_init, beta2_init, beta3_init]
 
-# print(f"Best initial beta: {best_beta} with Log-likelihood: {best_log_likelihood}")
+print(f"Best initial beta: {best_beta} with Log-likelihood: {best_log_likelihood}")
 
 
-best_beta = [0.0, -0.11, -0.88]  # -0.5555555555555556, -0.11111111111111116, -0.66
+# best_beta = [-0.3, -0.11, -0.6]  # -0.5555555555555556, -0.11111111111111116, -0.66
 
 
 # Step 5: Use the best beta found as the initial value for the optimization

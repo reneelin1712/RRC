@@ -263,8 +263,8 @@ test_data = pd.read_csv('test_CV0.csv')
 
 
 # Step 2: Convert a specific ori and des from edge numbers to node numbers
-ori_edge = 133  # Example origin edge n_id
-des_edge = 93   # Example destination edge n_id
+ori_edge = 240  # Example origin edge n_id
+des_edge = 159   # Example destination edge n_id
 
 ori_node = node_to_index[edge_to_nodes[ori_edge][0]]
 des_node = node_to_index[edge_to_nodes[des_edge][1]]
@@ -295,13 +295,13 @@ def convert_nodes_to_edges(node_path, index_to_node, edges):
         v_index = node_path[i + 1]
         u_osmid = index_to_node[u_index]
         v_osmid = index_to_node[v_index]
-        print('i',i)
-        print('u_osmid',u_osmid)
-        print('v_osmid',v_osmid)
+        # print('i',i)
+        # print('u_osmid',u_osmid)
+        # print('v_osmid',v_osmid)
         edge_id = edges[(edges['u'] == u_osmid) & (edges['v'] == v_osmid)]['n_id']
         if not edge_id.empty:
             edge_list.append(str(edge_id.values[0]))
-        print('edge_id',edge_id)
+        # print('edge_id',edge_id)
     return '_'.join(edge_list)
 
 # Create a DataFrame to store the result

@@ -257,87 +257,87 @@ print("Number of non-zero elements in lanes matrix:", lanes_matrix.nnz)
 # generated_traj_df.to_csv('generated_trajectories.csv', index=False)
 # print("Generated trajectories saved to 'generated_trajectories.csv'")
 
+#--------------------------------------------------
+# # Step 1: Load the test set
+# test_data = pd.read_csv('test_CV0.csv')
 
-# Step 1: Load the test set
-test_data = pd.read_csv('test_CV0.csv')
+# # Step 2: Convert the ori and des from edge numbers to node numbers
+# test_data['ori_node'] = test_data['ori'].apply(lambda x: node_to_index[edge_to_nodes[int(x)][0]])
+# test_data['des_node'] = test_data['des'].apply(lambda x: node_to_index[edge_to_nodes[int(x)][1]])
 
-# Step 2: Convert the ori and des from edge numbers to node numbers
-test_data['ori_node'] = test_data['ori'].apply(lambda x: node_to_index[edge_to_nodes[int(x)][0]])
-test_data['des_node'] = test_data['des'].apply(lambda x: node_to_index[edge_to_nodes[int(x)][1]])
+# # Initialize the model with the best beta values for prediction
+# model = RecursiveLogitModelPrediction(network_struct,
+#                                       initial_beta=np.array(best_beta), mu=1)
 
-# Initialize the model with the best beta values for prediction
-model = RecursiveLogitModelPrediction(network_struct,
-                                      initial_beta=np.array(best_beta), mu=1)
+# # Generate trajectories using the model for each pair of origin and destination
+# generated_trajectories = []
+# for index, row in test_data.iterrows():
+#     ori_node = row['ori_node']
+#     des_node = row['des_node']
 
-# Generate trajectories using the model for each pair of origin and destination
-generated_trajectories = []
-for index, row in test_data.iterrows():
-    ori_node = row['ori_node']
-    des_node = row['des_node']
+#     print('ori_node', ori_node)
+#     print('des_node', des_node)
 
-    print('ori_node', ori_node)
-    print('des_node', des_node)
-
-    try:
-        # Generate trajectory
-        obs = model.generate_observations(origin_indices=[ori_node], dest_indices=[des_node],
-                                          num_obs_per_pair=1, iter_cap=2000, rng_seed=42)
+#     try:
+#         # Generate trajectory
+#         obs = model.generate_observations(origin_indices=[ori_node], dest_indices=[des_node],
+#                                           num_obs_per_pair=1, iter_cap=2000, rng_seed=42)
         
-        # Check if the observation is valid
-        if obs and len(obs[0]) > 0:
-            print('obs', obs)
-            generated_trajectories.append(obs[0][1:])
-        else:
-            print(f"No valid trajectory found for ori_node: {ori_node}, des_node: {des_node}")
-            generated_trajectories.append([])  # Append empty trajectory if none found
+#         # Check if the observation is valid
+#         if obs and len(obs[0]) > 0:
+#             print('obs', obs)
+#             generated_trajectories.append(obs[0][1:])
+#         else:
+#             print(f"No valid trajectory found for ori_node: {ori_node}, des_node: {des_node}")
+#             generated_trajectories.append([])  # Append empty trajectory if none found
 
-    except Exception as e:
-        print(f"Error generating trajectory for ori_node: {ori_node}, des_node: {des_node}")
-        print(f"Exception: {e}")
-        generated_trajectories.append([])  # Append empty trajectory on error
+#     except Exception as e:
+#         print(f"Error generating trajectory for ori_node: {ori_node}, des_node: {des_node}")
+#         print(f"Exception: {e}")
+#         generated_trajectories.append([])  # Append empty trajectory on error
 
-# Add generated trajectories (in node index format) to the DataFrame
-test_data['generated_trajectory_nodes'] = ['_'.join(map(str, traj)) if traj else '' for traj in generated_trajectories]
+# # Add generated trajectories (in node index format) to the DataFrame
+# test_data['generated_trajectory_nodes'] = ['_'.join(map(str, traj)) if traj else '' for traj in generated_trajectories]
 
-# Save the DataFrame to CSV
-test_data.to_csv('trajectory_comparison.csv', index=False)
-print("Trajectory comparison saved to 'trajectory_comparison.csv'")
+# # Save the DataFrame to CSV
+# test_data.to_csv('trajectory_comparison.csv', index=False)
+# print("Trajectory comparison saved to 'trajectory_comparison.csv'")
 
-# Function to convert a path from edge IDs to node IDs
-def convert_path_to_node_sequence(edge_path, edge_to_nodes):
-    edge_ids = list(map(int, edge_path.split('_')))
-    node_sequence = []
+# # Function to convert a path from edge IDs to node IDs
+# def convert_path_to_node_sequence(edge_path, edge_to_nodes):
+#     edge_ids = list(map(int, edge_path.split('_')))
+#     node_sequence = []
 
-    for edge_id in edge_ids:
-        u, v = edge_to_nodes[edge_id]
-        if not node_sequence:
-            node_sequence.append(u)  # Start with the 'u' of the first edge
-        node_sequence.append(v)  # Append the 'v' of each edge to complete the sequence
+#     for edge_id in edge_ids:
+#         u, v = edge_to_nodes[edge_id]
+#         if not node_sequence:
+#             node_sequence.append(u)  # Start with the 'u' of the first edge
+#         node_sequence.append(v)  # Append the 'v' of each edge to complete the sequence
 
-    return '_'.join(node_sequence)
+#     return '_'.join(node_sequence)
 
-# Add the new column 'path_nodes' to the test_data DataFrame
-test_data['path_nodes'] = test_data['path'].apply(lambda x: convert_path_to_node_sequence(x, edge_to_nodes))
+# # Add the new column 'path_nodes' to the test_data DataFrame
+# test_data['path_nodes'] = test_data['path'].apply(lambda x: convert_path_to_node_sequence(x, edge_to_nodes))
 
-# Display the first few rows to verify the result
-print(test_data[['path', 'path_nodes']].head())
+# # Display the first few rows to verify the result
+# print(test_data[['path', 'path_nodes']].head())
 
-# Save the updated DataFrame to a new CSV file
-test_data.to_csv('test_data_with_node_paths.csv', index=False)
-print("Updated test data saved to 'test_data_with_node_paths.csv'")
+# # Save the updated DataFrame to a new CSV file
+# test_data.to_csv('test_data_with_node_paths.csv', index=False)
+# print("Updated test data saved to 'test_data_with_node_paths.csv'")
 
-# Function to convert osmids to node indices
-def convert_osmid_to_index(node_sequence, node_to_index):
-    osmids = node_sequence.split('_')
-    node_indices = [str(node_to_index[osmid]) for osmid in osmids]
-    return '_'.join(node_indices)
+# # Function to convert osmids to node indices
+# def convert_osmid_to_index(node_sequence, node_to_index):
+#     osmids = node_sequence.split('_')
+#     node_indices = [str(node_to_index[osmid]) for osmid in osmids]
+#     return '_'.join(node_indices)
 
-# Apply the function to the path_nodes column to get the node indices
-test_data['path_node_indices'] = test_data['path_nodes'].apply(lambda x: convert_osmid_to_index(x, node_to_index))
+# # Apply the function to the path_nodes column to get the node indices
+# test_data['path_node_indices'] = test_data['path_nodes'].apply(lambda x: convert_osmid_to_index(x, node_to_index))
 
-# Display the updated DataFrame to verify the results
-print(test_data[['path', 'path_nodes', 'path_node_indices']].head())
+# # Display the updated DataFrame to verify the results
+# print(test_data[['path', 'path_nodes', 'path_node_indices']].head())
 
-# Save the updated DataFrame to a new CSV file
-test_data.to_csv('test_data_with_node_indices.csv', index=False)
-print("Updated test data saved to 'test_data_with_node_indices.csv'")
+# # Save the updated DataFrame to a new CSV file
+# test_data.to_csv('test_data_with_node_indices.csv', index=False)
+# print("Updated test data saved to 'test_data_with_node_indices.csv'")
